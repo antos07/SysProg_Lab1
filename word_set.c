@@ -5,16 +5,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "word_map.h"
+#include "word_set.h"
 
-word_map_t *create_word_map(void) {
-    word_map_t *map = (word_map_t *) malloc(sizeof(word_map_t));
-    if (!map) {
+word_set_t *create_word_set(void) {
+    word_set_t *set = (word_set_t *) malloc(sizeof(word_set_t));
+    if (!set) {
         fprintf(stderr, "Failed to allocate memory!");
         exit(EXIT_FAILURE);
     }
-    map->root = NULL;
-    return map;
+    set->root = NULL;
+    return set;
 }
 
 static void delete_tree(tree_node_t *root) {
@@ -29,12 +29,12 @@ static void delete_tree(tree_node_t *root) {
     free(root);
 }
 
-void clear_word_map(word_map_t *map) {
-    if (!map) {
+void clear_word_set(word_set_t *set) {
+    if (!set) {
         return;
     }
-    delete_tree(map->root);
-    free(map);
+    delete_tree(set->root);
+    free(set);
 }
 
 static tree_node_t *create_tree_node(word_t word) {
@@ -70,11 +70,11 @@ static tree_node_t *insert_into_tree(tree_node_t *root, word_t word) {
     return root;
 }
 
-void insert_into_word_map(word_map_t *map, word_t word) {
-    if (!map) {
+void insert_into_word_set(word_set_t *set, word_t word) {
+    if (!set) {
         return;
     }
-    map->root = insert_into_tree(map->root, word);
+    set->root = insert_into_tree(set->root, word);
 }
 
 static tree_node_t *flatten_tree(tree_node_t *root) {
@@ -98,8 +98,8 @@ static tree_node_t *flatten_tree(tree_node_t *root) {
     return root;
 }
 
-void flatten_word_map(word_map_t *map) {
-    map->root = flatten_tree(map->root);
+void flatten_word_set(word_set_t *set) {
+    set->root = flatten_tree(set->root);
 }
 
 void print_tree(tree_node_t *root) {
@@ -112,8 +112,8 @@ void print_tree(tree_node_t *root) {
     print_tree(root->right);
 }
 
-void print_word_map(word_map_t *map) {
-    if (map) {
-        print_tree(map->root);
+void print_word_set(word_set_t *set) {
+    if (set) {
+        print_tree(set->root);
     }
 }

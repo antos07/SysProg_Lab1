@@ -2,15 +2,21 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "words.h"
-#include "word_map.h"
+#include "word_set.h"
 
 #define BUFFER_SIZE 256
+
+/*
+Task:
+Нехай відстань між двома словами – це кількість позицій, що відрізняються буквами. Знайти всі
+пари слів з найбільшою відстанню.
+ */
 
 bool is_word_char(char c) {
     return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z';
 }
 
-void read_words_into_map(FILE *input_file, word_map_t *map) {
+void read_words_into_set(FILE *input_file, word_set_t *set) {
     char buffer[BUFFER_SIZE];
     word_t word;
     size_t chars_in_buffer, word_length = 0;
@@ -27,7 +33,7 @@ void read_words_into_map(FILE *input_file, word_map_t *map) {
                 }
             } else if (word_length) {
                 word[word_length] = '\0';
-                insert_into_word_map(map, word);
+                insert_into_word_set(set, word);
                 word_length = 0;
             }
         }
@@ -35,19 +41,19 @@ void read_words_into_map(FILE *input_file, word_map_t *map) {
 
     if (word_length) {
         word[word_length] = '\0';
-        insert_into_word_map(map, word);
+        insert_into_word_set(set, word);
         word_length = 0;
     }
 }
 
-size_t find_max_word_distance(word_map_t *flat_map) {
-    if (!flat_map) {
+size_t find_max_word_distance(word_set_t *flat_set) {
+    if (!flat_set) {
         return 0;
     }
 
     size_t max_distance = 0;
 
-    tree_node_t *left_node = flat_map->root;
+    tree_node_t *left_node = flat_set->root;
     while (left_node) {
         tree_node_t *right_node = left_node->right;
         while (right_node) {
@@ -63,12 +69,12 @@ size_t find_max_word_distance(word_map_t *flat_map) {
     return max_distance;
 }
 
-void print_words_with_distance(word_map_t *flat_map, size_t distance) {
-    if (!flat_map) {
+void print_words_with_distance(word_set_t *flat_set, size_t distance) {
+    if (!flat_set) {
         return;
     }
 
-    tree_node_t *left_node = flat_map->root;
+    tree_node_t *left_node = flat_set->root;
     while (left_node) {
         tree_node_t *right_node = left_node->right;
         while (right_node) {
@@ -82,20 +88,20 @@ void print_words_with_distance(word_map_t *flat_map, size_t distance) {
 }
 
 void process_file(FILE *input_file) {
-    word_map_t *map = create_word_map();
-    read_words_into_map(input_file, map);
+    word_set_t *set = create_word_set();
+    read_words_into_set(input_file, set);
 
-    flatten_word_map(map);   // convert to linked list
-    size_t max_distance = find_max_word_distance(map);
+    flatten_word_set(set);   // convert to linked list
+    size_t max_distance = find_max_word_distance(set);
 
     if (max_distance == 0) {
         printf("Less than 2 unique words\n");
         return;
     }
     printf("Max distance between words: %ld.\nThe words with the max distance between them:\n", max_distance);
-    print_words_with_distance(map, max_distance);
+    print_words_with_distance(set, max_distance);
 
-    clear_word_map(map);
+    clear_word_set(set);
 }
 
 int main(int argc, char **argv) {
